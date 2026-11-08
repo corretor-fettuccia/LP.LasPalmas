@@ -1,0 +1,31 @@
+# Residencial Las Palmas
+
+> Residencial Las Palmas no Mato Grande, Canoas - apartamentos de 1 e 2 dormitórios, piscina e lazer. A partir de R$ 189.990.
+
+## Informações principais
+
+- Localização: Rua Afonso Pena, 30, Mato Grande, Canoas, RS
+- Tipologia declarada: ApartmentComplex
+- Página oficial: [Residencial Las Palmas](https://laspalmas.mcmv-rs.com.br/)
+
+## Conteúdo da página
+
+- Seu novo apartamento a partir de R$ 719,00/mês com piscina e elevador.
+- PISCINAS ADULTO E INFANTIL
+- Um endereço para começar bem e viver mais.
+- Seção 5
+- Conteúdo incorporado
+- Previsão de execução da obra
+- Um apartamento que pode caber no seu planejamento.
+- Lazer e facilidades para a rotina de toda a família.
+- Escolas, mercados e serviços na região do Las Palmas.
+- Perguntas frequentes sobre o Las Palmas
+- Conheça as condições do Las Palmas
+
+## Conteúdo detalhado
+
+- [Descrição estruturada da página](llms-full.txt)
+
+## Condições comerciais e atendimento
+
+Valores, disponibilidade, condições financeiras e prazos devem ser confirmados com o responsável. Formulários de contato e agendamento exigem ação e consentimento do visitante.
