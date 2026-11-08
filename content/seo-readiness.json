@@ -1,5 +1,5 @@
 {
-  "version": "7.3.7",
+  "version": "7.3.8",
   "metrics": {
     "coreWebVitalsPotential": 9.2,
     "crawlArchitecture": 9.5,
@@ -8,5 +8,5 @@
     "scaleSafety": 8.5
   },
   "average": 8.9,
-  "generatedAt": "2026-11-08T02:35:46.440Z"
+  "generatedAt": "2026-11-08T16:02:44.225Z"
 }

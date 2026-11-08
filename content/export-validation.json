@@ -1,9 +1,9 @@
 {
-  "version": "7.3.7",
+  "version": "7.3.8",
   "passed": true,
-  "generatedAt": "2026-11-08T02:35:46.449Z",
+  "generatedAt": "2026-11-08T16:02:44.233Z",
   "canonical": "https://laspalmas.mcmv-rs.com.br/",
-  "images": 19,
+  "images": 20,
   "checks": [
     {
       "id": "html-main",
@@ -139,7 +139,7 @@
     },
     {
       "id": "external-images",
-      "ok": false,
+      "ok": true,
       "level": "warning",
       "message": "Imagens em outros domínios: verifique a propriedade desses hosts no Search Console e libere Googlebot."
     },
@@ -151,9 +151,7 @@
     }
   ],
   "errors": [],
-  "warnings": [
-    "Imagens em outros domínios: verifique a propriedade desses hosts no Search Console e libere Googlebot."
-  ],
+  "warnings": [],
   "notes": [
     "Auditoria estática dos arquivos gerados: não substitui Lighthouse, validação WebMCP em navegador compatível ou teste publicado por HTTPS.",
     "llms.txt é informativo; não garante posicionamento ou indexação por ferramentas de IA.",
