@@ -1,9 +1,9 @@
 {
-  "version": "7.3.8",
+  "version": "7.5.0",
   "passed": true,
-  "generatedAt": "2026-11-08T16:02:44.233Z",
+  "generatedAt": "2026-11-08T23:58:59.478Z",
   "canonical": "https://laspalmas.mcmv-rs.com.br/",
-  "images": 20,
+  "images": 21,
   "checks": [
     {
       "id": "html-main",

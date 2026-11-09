@@ -406,6 +406,9 @@
 })();
 
 
+(function(){})();
+
+
 (function () {
   'use strict';
 
@@ -918,10 +921,22 @@
 
       // A âncora configurada identifica primeiro o destino real; a existência de
       // um Popup em outra parte da página não deve sequestrar o clique do V4.
-      function targetScope() {
+      // 1.5.0 — Uma página pode ter a mesma âncora em várias seções (ex.: botões
+      // e formulário com "contato"). getElementById devolvia o PRIMEIRO, um botão,
+      // e a navegação parava antes do formulário. Agora todos os candidatos são
+      // avaliados e o que pertence a um formulário tem prioridade.
+      function anchorCandidates() {
         var anchor = detail.targetAnchor;
-        if (!anchor) return null;
-        try { return document.getElementById(anchor); } catch (_) { return null; }
+        if (!anchor) return [];
+        try { return Array.prototype.slice.call(document.querySelectorAll('[id="' + anchor.replace(/["\\]/g, '\\$&') + '"]')); }
+        catch (_) { var one = document.getElementById(anchor); return one ? [one] : []; }
+      }
+      function targetScope() {
+        var list = anchorCandidates();
+        for (var i = 0; i < list.length; i++) {
+          if (pluginFor(list[i], 'form-sender-v4') || pluginFor(list[i], 'agendamento-sender') || pluginFor(list[i], 'form-sender-popup')) return list[i];
+        }
+        return list[0] || null;
       }
       function pluginFor(scope, pluginName) {
         if (!scope) return null;
@@ -1064,9 +1079,24 @@
       // SEMPRE ao ID configurado no Smart Plant (ex.: #contato). Na versao
       // anterior, uma ancora pertencente a outro componente era ignorada.
       var configuredAnchor = detail.targetAnchor || 'contato';
-      var destination = anchorElement || chosen.section;
+      // 1.5.0 — O destino da rolagem é SEMPRE o formulário que recebeu a planta.
+      // A âncora configurada é usada quando está no próprio formulário, ou quando
+      // marca um título logo acima dele (até 1,5 tela antes). Uma âncora em outro
+      // componente distante (ex.: um botão com "contato") não desvia mais o clique.
       function currentDestination() {
-        return document.getElementById(configuredAnchor) || (destination && destination.isConnected ? destination : chosen.section);
+        var form = chosen.section && chosen.section.isConnected ? chosen.section : null;
+        var list = anchorCandidates();
+        if (!form) return list[0] || null;
+        for (var i = 0; i < list.length; i++) {
+          if (form.contains(list[i]) || list[i].contains(form)) return list[i];
+        }
+        var formTop = form.getBoundingClientRect().top;
+        var limit = (window.innerHeight || 800) * 1.5;
+        for (var j = 0; j < list.length; j++) {
+          var gap = formTop - list[j].getBoundingClientRect().top;
+          if (gap >= 0 && gap <= limit) return list[j];
+        }
+        return form;
       }
       var selectedMount = chosen.mount;
       // Na prévia de edição, desativa o auto-foco da seção selecionada
@@ -1359,6 +1389,16 @@
     const content=root.dataset.mfHtml||'';
     const valid=html?!!content.trim():!!address;
     root.dataset.mfState=valid?'ready':'invalid';
+    // 1.0.2 — A orientação técnica existe só no editor. Na página publicada,
+    // um MainFrame sem conteúdo válido é ocultado (sem texto para o visitante).
+    const editor=window.__IMOBIFY_EDITOR__===true;
+    const section=root.closest('[data-plugin="mainframe"]')||root;
+    const notice=root.querySelector('.mf-notice');
+    if(notice){
+      notice.textContent=(!valid&&editor)?'MainFrame sem conteúdo: informe uma URL HTTPS válida ou o HTML no inspetor. Na página publicada esta seção fica oculta.':'';
+      notice.hidden=valid||!editor;
+    }
+    if(!editor){if(valid)section.removeAttribute('hidden');else section.setAttribute('hidden','');}
     if(!valid){frame.removeAttribute('src');frame.removeAttribute('srcdoc');return;}
     frame.setAttribute('loading',yes(root.dataset.mfLazy)?'lazy':'eager');
     frame.setAttribute('referrerpolicy','origin');
@@ -1418,9 +1458,6 @@
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>init(),{once:true});else init();
 })();
-
-
-(function(){})();
 
 
 (function(){
@@ -2749,6 +2786,176 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     document.addEventListener("DOMContentLoaded", initialize, { once: true });
   } else {
     initialize();
+  }
+})();
+
+
+(function () {
+  "use strict";
+
+  const POSITION_MAP = {
+    "Inferior direita": "bottom-right",
+    "Inferior esquerda": "bottom-left",
+    "Superior direita": "top-right",
+    "Superior esquerda": "top-left"
+  };
+
+  function asBoolean(value) {
+    return String(value).toLowerCase() === "true" || value === "1";
+  }
+
+  function sanitizePhone(value) {
+    return String(value || "").replace(/\D+/g, "");
+  }
+
+  function safeEncodedMessage(message, mode) {
+    const text = String(message || "").trim();
+    if (!text) return "";
+
+    if (mode === "Mensagem já codificada") {
+      try {
+        return encodeURIComponent(decodeURIComponent(text));
+      } catch (_) {
+        return text;
+      }
+    }
+
+    return encodeURIComponent(text);
+  }
+
+  function moveToViewportRoot(widget) {
+    if (!(widget instanceof HTMLElement)) return;
+
+    /*
+     * Um elemento position:fixed pode deixar de usar a viewport quando algum
+     * ancestral possui transform, filter, perspective, contain ou animações de
+     * reveal. O Imobify envolve as seções em elementos desse tipo.
+     *
+     * Por isso o widget é movido para document.body. Assim ele fica visível
+     * desde o carregamento e não depende da posição da seção na página.
+     */
+    if (widget.parentElement !== document.body) {
+      widget.dataset.iwfpOriginalParent = "section";
+      document.body.appendChild(widget);
+    }
+  }
+
+  function configureWidget(widget) {
+    if (!(widget instanceof HTMLElement)) return;
+
+    moveToViewportRoot(widget);
+
+    const button = widget.querySelector(".iwfp-button");
+    if (!(button instanceof HTMLAnchorElement)) return;
+
+    const phone = sanitizePhone(widget.dataset.phone);
+    const encodedMessage = safeEncodedMessage(
+      widget.dataset.message,
+      widget.dataset.urlEncoding
+    );
+
+    const url = phone
+      ? `https://wa.me/${phone}${encodedMessage ? `?text=${encodedMessage}` : ""}`
+      : "#";
+
+    widget.dataset.corner = POSITION_MAP[widget.dataset.position] || "bottom-right";
+    widget.dataset.label = String(asBoolean(widget.dataset.showLabel));
+    widget.dataset.pulse = String(asBoolean(widget.dataset.pulse));
+    widget.dataset.bubble = String(asBoolean(widget.dataset.showHoverBubble));
+    widget.dataset.hoverPhoto = String(Boolean(String(widget.dataset.hoverImage || "").trim()));
+
+    widget.style.setProperty(
+      "--iwfp-offset-x",
+      `${Math.max(0, Number(widget.dataset.offsetX) || 0)}px`
+    );
+    widget.style.setProperty(
+      "--iwfp-offset-y",
+      `${Math.max(0, Number(widget.dataset.offsetY) || 0)}px`
+    );
+    widget.style.setProperty(
+      "--iwfp-size",
+      `${Math.max(44, Number(widget.dataset.buttonSize) || 58)}px`
+    );
+
+    button.href = url;
+
+    if (asBoolean(widget.dataset.openNewTab)) {
+      button.target = "_blank";
+      button.rel = "noopener noreferrer";
+    } else {
+      button.removeAttribute("target");
+      button.removeAttribute("rel");
+    }
+
+    button.setAttribute("aria-disabled", phone ? "false" : "true");
+
+    if (!button.dataset.iwfpClickBound) {
+      button.addEventListener("click", function (event) {
+        if (!sanitizePhone(widget.dataset.phone)) {
+          event.preventDefault();
+        }
+      });
+      button.dataset.iwfpClickBound = "true";
+    }
+
+    widget.dataset.iwfpReady = "true";
+  }
+
+  function initializeAll(root) {
+    const scope = root instanceof Element || root instanceof Document ? root : document;
+
+    if (scope instanceof Element && scope.matches(".iwfp-widget")) {
+      configureWidget(scope);
+    }
+
+    scope.querySelectorAll(".iwfp-widget").forEach(configureWidget);
+  }
+
+  function start() {
+    initializeAll(document);
+
+    const observer = new MutationObserver(function (mutations) {
+      for (const mutation of mutations) {
+        if (mutation.type === "attributes") {
+          const target = mutation.target;
+          if (target instanceof HTMLElement && target.matches(".iwfp-widget")) {
+            configureWidget(target);
+          }
+          continue;
+        }
+
+        for (const node of mutation.addedNodes) {
+          if (!(node instanceof Element)) continue;
+          initializeAll(node);
+        }
+      }
+    });
+
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: [
+        "data-phone",
+        "data-message",
+        "data-url-encoding",
+        "data-position",
+        "data-offset-x",
+        "data-offset-y",
+        "data-button-size",
+        "data-show-label",
+        "data-pulse",
+        "data-show-hover-bubble",
+        "data-hover-image",
+        "data-open-new-tab"
+      ]
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start, { once: true });
+  } else {
+    start();
   }
 })();
 

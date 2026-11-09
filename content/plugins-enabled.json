@@ -10,12 +10,22 @@
     "packageType": "core"
   },
   {
+    "id": "payment",
+    "name": "Condições de pagamento",
+    "type": "section",
+    "compositionRole": "section",
+    "compositionCardinality": "multiple",
+    "version": "1.0.0",
+    "source": "plugins/payment/plugin.json",
+    "packageType": "core"
+  },
+  {
     "id": "smart-plant",
     "name": "Smart Plant",
     "type": "section",
     "compositionRole": "both",
     "compositionCardinality": "multiple",
-    "version": "1.4.9",
+    "version": "1.5.0",
     "source": "plugins/smart-plant-v1.4.2/plugin.json",
     "packageType": "bundled"
   },
@@ -45,7 +55,7 @@
     "type": "section",
     "compositionRole": "both",
     "compositionCardinality": "multiple",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "source": "plugins/mainframe/plugin.json",
     "packageType": "bundled"
   },
@@ -58,16 +68,6 @@
     "version": "1.2.1",
     "source": "plugins/only-text-context/plugin.json",
     "packageType": "bundled"
-  },
-  {
-    "id": "payment",
-    "name": "Condições de pagamento",
-    "type": "section",
-    "compositionRole": "section",
-    "compositionCardinality": "multiple",
-    "version": "1.0.0",
-    "source": "plugins/payment/plugin.json",
-    "packageType": "core"
   },
   {
     "id": "button-single",
@@ -137,6 +137,16 @@
     "compositionCardinality": "multiple",
     "version": "1.0.0",
     "source": "plugins/anti-ia-copy/plugin.json",
+    "packageType": "bundled"
+  },
+  {
+    "id": "whatsapp-flutuante-pro",
+    "name": "WhatsApp flutuante Pro",
+    "type": "section",
+    "compositionRole": "both",
+    "compositionCardinality": "multiple",
+    "version": "1.1.0",
+    "source": "plugins/whatsapp-flutuante-pro/plugin.json",
     "packageType": "bundled"
   },
   {

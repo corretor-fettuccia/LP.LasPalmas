@@ -1,7 +1,7 @@
-LANDING PAGE COMPILADA — IMOBIFY STUDIO 7.3.8
+LANDING PAGE COMPILADA — IMOBIFY STUDIO 7.5.0
 
-Projeto: Residencial Las Palmas | Alternativa Conversão por Benefício
-Gerado em: 08/11/2026, 13:02:44
+Projeto: Residencial Las Palmas | Conversão por Benefício · v2 (EC 3.1)
+Gerado em: 08/11/2026, 20:58:59
 
 PUBLICAÇÃO
 Envie todo o conteúdo desta pasta para a raiz do seu serviço de hospedagem, GitHub Pages, Netlify, Vercel ou servidor web. A página é estática e não exige banco de dados.
@@ -36,3 +36,4 @@ assets/images/property-slider-slide-5-image-14.webp
 assets/images/property-slider-image1-15.webp
 assets/images/property-slider-image2-16.webp
 assets/images/property-slider-image3-17.webp
+assets/images/whatsapp-flutuante-pro-hoverimage-18.jpg
